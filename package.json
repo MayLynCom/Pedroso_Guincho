@@ -1,0 +1,11 @@
+{
+  "name": "auto-socorro",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "netlify dev --port 8888 --dir . --functions netlify/functions"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
+

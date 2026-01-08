@@ -111,7 +111,7 @@ function calculatePrice(distanceKm, vehicleType) {
     return base;
   }
 
-  return base + (distanceKm - 40) * extra;
+  return base + (distanceKm - 25) * extra;
 }
 
 function respond(statusCode, body) {

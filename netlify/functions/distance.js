@@ -107,7 +107,7 @@ function calculatePrice(distanceKm, vehicleType) {
 
   const { base, extra } = rules[vehicleType] || rules.carro;
 
-  if (distanceKm <= 40) {
+  if (distanceKm <= 25) {
     return base;
   }
 

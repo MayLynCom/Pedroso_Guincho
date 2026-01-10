@@ -40,9 +40,11 @@ exports.handler = async (event) => {
       totalKm += await fetchDistanceInKm(leg.origins, leg.destinations);
     }
 
+    const surchargeAmount = getSurchargeAmount();
+
     return respond(200, {
       distanceKm: totalKm,
-      price: calculatePrice(totalKm, vehicleType),
+      price: calculatePrice(totalKm, vehicleType, surchargeAmount),
     });
   } catch (error) {
     return respond(500, {
@@ -96,7 +98,7 @@ function mapElementStatusToMessage(status) {
   }
 }
 
-function calculatePrice(distanceKm, vehicleType) {
+function calculatePrice(distanceKm, vehicleType, surchargeAmount = 0) {
   const rules = {
     carro: { base: 150, extra: 5 },
     moto: { base: 150, extra: 5 },
@@ -106,12 +108,50 @@ function calculatePrice(distanceKm, vehicleType) {
   };
 
   const { base, extra } = rules[vehicleType] || rules.carro;
+  const baseValue = base + surchargeAmount;
 
   if (distanceKm <= 25) {
-    return base;
+    return baseValue;
   }
 
-  return base + (distanceKm - 25) * extra;
+  return baseValue + (distanceKm - 25) * extra;
+}
+
+function getSurchargeAmount(date = new Date()) {
+  const { weekday, hour } = getSaoPauloTimeParts(date);
+  if (!weekday || typeof hour !== "number" || Number.isNaN(hour)) {
+    return 0;
+  }
+
+  const isWeekend = weekday === "Sat" || weekday === "Sun";
+  if (isWeekend) {
+    if (hour >= 6 && hour < 22) {
+      return 50;
+    }
+    return 100;
+  }
+
+  return hour >= 22 ? 100 : 0;
+}
+
+function getSaoPauloTimeParts(date) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo",
+    weekday: "short",
+    hour: "numeric",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  let weekday;
+  let hour;
+  for (const part of parts) {
+    if (part.type === "weekday") {
+      weekday = part.value;
+    } else if (part.type === "hour") {
+      hour = Number(part.value);
+    }
+  }
+  return { weekday, hour };
 }
 
 function respond(statusCode, body) {

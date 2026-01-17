@@ -57,6 +57,7 @@ if (cepForm) {
         currency: "BRL",
         minimumFractionDigits: 2,
       });
+      setConversionValue(lastResultData);
       showResult();
       updateCallButtonState();
     } catch (error) {
@@ -99,18 +100,16 @@ function updateCallButtonState() {
 if (callButton) {
   callButton.addEventListener("click", () => {
     if (!lastResultData) return;
-    pushConversionData(lastResultData);
     const message = buildWhatsappMessage(lastResultData);
     const url = `https://wa.me/554198222624?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   });
 }
 
-function pushConversionData(data) {
+function setConversionValue(data) {
   if (typeof window === "undefined") return;
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
-    event: "whatsapp_lead",
     value: Number(data.price.toFixed(2)),
     currency: "BRL",
   });

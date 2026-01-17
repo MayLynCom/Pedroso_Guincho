@@ -110,11 +110,11 @@ function calculatePrice(distanceKm, vehicleType, surchargeAmount = 0) {
   const { base, extra } = rules[vehicleType] || rules.carro;
   const baseValue = base + surchargeAmount;
 
-  if (distanceKm <= 25) {
+  if (distanceKm <= 40) {
     return baseValue;
   }
 
-  return baseValue + (distanceKm - 25) * extra;
+  return baseValue + (distanceKm - 40) * extra;
 }
 
 function getSurchargeAmount(date = new Date()) {
@@ -123,15 +123,8 @@ function getSurchargeAmount(date = new Date()) {
     return 0;
   }
 
-  const isWeekend = weekday === "Sat" || weekday === "Sun";
-  if (isWeekend) {
-    if (hour >= 6 && hour < 22) {
-      return 50;
-    }
-    return 100;
-  }
-
-  return hour >= 22 ? 100 : 0;
+  const isNight = hour >= 22 || hour < 6;
+  return isNight ? 100 : 0;
 }
 
 function getSaoPauloTimeParts(date) {
